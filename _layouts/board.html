@@ -1,0 +1,162 @@
+<!-- Created: 2026-05-17 22:01 -->
+---
+layout: page
+---
+
+{{ content }}
+
+<style>
+  #nanumteo {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  #nanumteo .write-box {
+    background: #fffdf8;
+    border: 1px solid #e0d5c0;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 28px;
+  }
+  #nanumteo .write-box input[type="text"],
+  #nanumteo .write-box textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #d0c8b0;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px;
+    background: #fff;
+    color: #2c2c2c;
+    margin-bottom: 10px;
+    resize: vertical;
+  }
+  #nanumteo .write-box textarea { min-height: 90px; }
+  #nanumteo .write-box .btn-post {
+    background: #1C2E54;
+    color: #F5DEB3;
+    border: none;
+    border-radius: 6px;
+    padding: 9px 22px;
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  #nanumteo .write-box .btn-post:hover { background: #253d72; }
+  #nanumteo .posts-list { list-style: none; padding: 0; margin: 0; }
+  #nanumteo .post-card {
+    background: #fffdf8;
+    border: 1px solid #e0d5c0;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  #nanumteo .post-card .post-author {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 700;
+    color: #1C2E54;
+    font-size: 15px;
+  }
+  #nanumteo .post-card .post-time {
+    font-size: 11px;
+    color: #aaa;
+    margin-left: 10px;
+  }
+  #nanumteo .post-card .post-body {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #333;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  #nanumteo .empty-msg {
+    text-align: center;
+    color: #bbb;
+    padding: 40px 0;
+    font-size: 14px;
+  }
+  #nanumteo .loading-msg {
+    text-align: center;
+    color: #bbb;
+    padding: 20px 0;
+    font-size: 13px;
+  }
+</style>
+
+<div id="nanumteo">
+  <div class="write-box">
+    <input type="text" id="author" placeholder="이름 (예: 미나)" maxlength="20" />
+    <textarea id="body" placeholder="나누고 싶은 이야기를 써주세요..." maxlength="1000"></textarea>
+    <button class="btn-post" onclick="submitPost()">올리기</button>
+  </div>
+  <div id="loading" class="loading-msg">불러오는 중...</div>
+  <ul class="posts-list" id="posts-list"></ul>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script>
+  const fbConfig = {
+    apiKey: "AIzaSyCszbfMt-dUM9zCDpivTXm0jKxIqGX9Jvg",
+    authDomain: "camping-2026-af510.firebaseapp.com",
+    databaseURL: "https://camping-2026-af510-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "camping-2026-af510",
+    storageBucket: "camping-2026-af510.firebasestorage.app",
+    messagingSenderId: "639131418484",
+    appId: "1:639131418484:web:f95d9abad3e8e8ba8b50c0"
+  };
+
+  if (!firebase.apps.length) firebase.initializeApp(fbConfig);
+  const db = firebase.database();
+  const postsRef = db.ref('nanumteo/posts');
+
+  function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function formatTime(ts) {
+    const d = new Date(ts);
+    const pad = n => String(n).padStart(2,'0');
+    return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function renderPost(snap) {
+    const p = snap.val();
+    if (!p) return null;
+    const li = document.createElement('li');
+    li.className = 'post-card';
+    li.innerHTML = `<div>
+      <span class="post-author">${escapeHtml(p.author || '익명')}</span>
+      <span class="post-time">${formatTime(p.createdAt)}</span>
+    </div>
+    <div class="post-body">${escapeHtml(p.body)}</div>`;
+    return li;
+  }
+
+  postsRef.orderByChild('createdAt').on('value', function(snap) {
+    document.getElementById('loading').style.display = 'none';
+    const list = document.getElementById('posts-list');
+    list.innerHTML = '';
+    const posts = [];
+    snap.forEach(child => posts.push(child));
+    if (posts.length === 0) {
+      list.innerHTML = '<li class="empty-msg">아직 글이 없습니다. 첫 번째로 이야기를 나눠보세요!</li>';
+      return;
+    }
+    posts.reverse().forEach(child => {
+      const el = renderPost(child);
+      if (el) list.appendChild(el);
+    });
+  });
+
+  function submitPost() {
+    const author = document.getElementById('author').value.trim() || '익명';
+    const body = document.getElementById('body').value.trim();
+    if (!body) { alert('내용을 입력해주세요.'); return; }
+    postsRef.push({ author, body, createdAt: Date.now() })
+      .then(() => { document.getElementById('body').value = ''; })
+      .catch(err => alert('저장 실패: ' + err.message));
+  }
+</script>
