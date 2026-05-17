@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>메이메이 소풍 일정 🌅</title>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<style>
+  :root {
+    --sky: #1a3a5c;
+    --sky-mid: #2d6a9b;
+    --sunset: #e8803a;
+    --ember: #c45a1a;
+    --gold: #f5c842;
+    --green: #0d5c2e;
+    --green-mid: #1a8c4a;
+    --cream: #fdf8f0;
+    --warm-white: #fffdf8;
+    --text-dark: #1a1a2e;
+    --text-mid: #4a4a5a;
+    --text-soft: #7a7a8a;
+    --card-bg: rgba(255,255,255,0.92);
+    --shadow: 0 4px 24px rgba(26,58,92,0.10);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--cream);
+    color: var(--text-dark);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    min-height: 52vw;
+    max-height: 320px;
+    background: linear-gradient(175deg, #0F4C81 0%, #1B7FBF 18%, #2196F3 38%, #64B5F6 58%, #B3E5FC 78%, #C8E6C9 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 20px 28px;
+    overflow: hidden;
+  }
+  .hero::before {
+    content:'';
+    position:absolute; inset:0;
+    background: radial-gradient(ellipse 60% 45% at 50% 30%, rgba(255,255,255,0.22) 0%, transparent 65%);
+    pointer-events:none;
+  }
+  /* clouds */
+  .cloud {
+    position:absolute; background:rgba(255,255,255,0.82);
+    border-radius:50px; height:18px;
+  }
+  .cloud::before, .cloud::after {
+    content:''; position:absolute; background:rgba(255,255,255,0.82); border-radius:50%;
+  }
+  .cloud-1 { width:70px; top:18%; left:10%; animation:drift 18s linear infinite; }
+  .cloud-1::before { width:30px; height:30px; top:-14px; left:12px; }
+  .cloud-1::after  { width:22px; height:22px; top:-10px; left:36px; }
+  .cloud-2 { width:55px; top:30%; left:60%; animation:drift 24s linear infinite; opacity:.7; }
+  .cloud-2::before { width:24px; height:24px; top:-11px; left:10px; }
+  .cloud-2::after  { width:18px; height:18px; top:-8px;  left:30px; }
+  .cloud-3 { width:45px; top:12%; left:75%; animation:drift 20s linear infinite; opacity:.6; }
+  .cloud-3::before { width:20px; height:20px; top:-9px;  left:8px; }
+  .cloud-3::after  { width:15px; height:15px; top:-7px;  left:26px; }
+  @keyframes drift { 0%{transform:translateX(0)} 100%{transform:translateX(-120vw)} }
+
+  /* sun */
+  .sun-wrap {
+    position:absolute; bottom:52%; left:50%; transform:translateX(-50%);
+    display:flex; flex-direction:column; align-items:center;
+  }
+  .sun-orb {
+    width:48px; height:48px; border-radius:50%;
+    background: radial-gradient(circle, #fff 15%, #FFFDE7 40%, #FFF176 70%, #FFEE58 100%);
+    box-shadow: 0 0 30px 12px rgba(255,238,88,0.75), 0 0 70px 35px rgba(255,238,88,0.3);
+    animation: glow 5s ease-in-out infinite;
+  }
+  @keyframes glow {
+    0%,100%{box-shadow:0 0 30px 12px rgba(255,238,88,.75), 0 0 70px 35px rgba(255,238,88,.3)}
+    50%{box-shadow:0 0 44px 18px rgba(255,238,88,.9), 0 0 90px 50px rgba(255,238,88,.4)}
+  }
+  .sun-reflection {
+    width:14px; height:44px; margin-top:2px;
+    background: linear-gradient(to bottom, rgba(255,255,255,.45), transparent);
+    border-radius:50%;
+  }
+
+  /* mountain silhouette */
+  .mountains {
+    position:absolute; bottom:0; left:0; width:100%;
+    display:flex; align-items:flex-end; gap:0;
+  }
+  .mt { background:#2E7D32; }
+  .mt1 { width:40%; height:60px; clip-path: polygon(0% 100%, 50% 0%, 100% 100%); }
+  .mt2 { width:35%; height:80px; clip-path: polygon(0% 100%, 48% 0%, 100% 100%); margin-left:-8%; background:#388E3C; }
+  .mt3 { width:40%; height:50px; clip-path: polygon(0% 100%, 55% 0%, 100% 100%); margin-left:-10%; }
+
+  .hero-tag {
+    font-family:'Noto Sans KR', sans-serif;
+    font-size:11px; font-weight:500;
+    letter-spacing:3px; color:rgba(255,255,255,0.65);
+    margin-bottom:6px; position:relative; z-index:2;
+  }
+  .hero-title {
+    font-family:'Nanum Myeongjo', serif;
+    font-size:28px; font-weight:800;
+    color:#fff; text-align:center; line-height:1.25;
+    position:relative; z-index:2;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  }
+  .hero-sub {
+    font-size:12.5px; color:rgba(255,255,255,0.75);
+    margin-top:6px; position:relative; z-index:2; text-align:center;
+  }
+  .hero-date {
+    font-size:13px; color:rgba(255,255,255,0.9); font-weight:500;
+    margin-top:5px; position:relative; z-index:2; text-align:center;
+    letter-spacing:0.3px;
+  }
+  .hero-weather {
+    position:relative; z-index:2;
+    display:inline-flex; align-items:center; gap:6px;
+    margin-top:9px;
+    background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.28);
+    border-radius:22px; padding:6px 16px;
+    font-size:12.5px; color:rgba(255,255,255,0.92);
+    backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+  }
+  .hw-icon { font-size:15px; line-height:1; }
+  .hw-temp { font-weight:700; letter-spacing:0.2px; }
+  .hw-sep { opacity:0.5; }
+  .hw-rain { opacity:0.9; }
+  .hw-desc { opacity:0.8; font-size:11.5px; }
+
+  /* ── BADGE ROW ── */
+
+  /* ── SECTION ── */
+  .section { padding:20px 16px 0; }
+  .sec-title {
+    font-size:11px; font-weight:700;
+    letter-spacing:2px; color:var(--text-soft);
+    margin-bottom:12px; text-transform:uppercase;
+  }
+
+  /* ── CONFIRMED BANNER ── */
+  .confirmed-banner {
+    margin:16px 16px 0;
+    background:linear-gradient(120deg,#0a4520,#1a8c4a);
+    border-radius:16px; padding:14px 16px;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .cb-top { display:flex; align-items:center; gap:12px; }
+  .cb-icon { font-size:24px; }
+  .cb-body { flex:1; }
+  .cb-title { font-size:14px; font-weight:700; color:#fff; }
+  .cb-desc { font-size:11.5px; color:rgba(255,255,255,0.8); margin-top:2px; line-height:1.5; }
+  .cb-sites {
+    display:flex; gap:8px; margin-top:6px;
+  }
+  .cb-site-badge {
+    background:rgba(255,255,255,0.22); border:1.5px solid rgba(255,255,255,0.5);
+    border-radius:8px; padding:3px 12px;
+    font-size:13px; font-weight:700; color:#fff; letter-spacing:0.5px;
+  }
+  .cb-chip {
+    background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.4);
+    border-radius:10px; padding:3px 10px;
+    font-size:11px; font-weight:700; color:#fff; white-space:nowrap;
+  }
+  .cb-map {
+    border-radius:10px; overflow:hidden;
+    border:2px solid rgba(255,255,255,0.3);
+    cursor:zoom-in;
+  }
+  .cb-map-inner { position:relative; }
+  .cb-map img {
+    width:100%; display:block;
+    max-height:220px; object-fit:cover; object-position:center;
+  }
+  .cb-map-svg {
+    position:absolute; inset:0; width:100%; height:100%; pointer-events:none;
+  }
+  .cb-map-caption {
+    background:rgba(0,0,0,0.35); padding:5px 10px;
+    font-size:11px; color:rgba(255,255,255,0.85); text-align:center;
+  }
+  .cb-direction {
+    margin-top:10px; display:flex; flex-direction:column; gap:5px;
+  }
+  .cb-dir-row {
+    font-size:11.5px; color:rgba(255,255,255,0.82); line-height:1.5;
+  }
+
+  /* ── LIGHTBOX ── */
+  .lightbox {
+    display:none; position:fixed; inset:0; z-index:9999;
+    background:rgba(0,0,0,0.88);
+    align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  .lightbox.open { display:flex; }
+  #lightbox-content {
+    position:relative; display:inline-flex;
+    transform-origin:center center;
+    touch-action:none; will-change:transform;
+  }
+  #lightbox-content img {
+    max-width:94vw; max-height:88vh;
+    border-radius:10px; object-fit:contain;
+    box-shadow:0 8px 40px rgba(0,0,0,0.6);
+    user-select:none; -webkit-user-select:none;
+    display:block;
+  }
+  .lb-marker {
+    position:absolute; transform:translate(-50%,-50%);
+    background:rgba(220,40,40,0.90); border:2.5px solid #fff;
+    border-radius:50%; width:38px; height:38px;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-weight:700; font-size:12px;
+    pointer-events:none; white-space:nowrap;
+  }
+  .lightbox-close {
+    position:absolute; top:16px; right:18px;
+    font-size:32px; color:#fff; cursor:pointer;
+    line-height:1; opacity:0.8; z-index:1;
+  }
+  .lightbox-close:hover { opacity:1; }
+  .lightbox-hint {
+    position:absolute; bottom:20px; left:50%; transform:translateX(-50%);
+    font-size:11px; color:rgba(255,255,255,0.5); white-space:nowrap; pointer-events:none;
+  }
+
+  /* ── FROG BOX ── */
+  .frog-box {
+    margin:16px 16px 0;
+    background:#fff; border:2px solid #1a8c4a;
+    border-radius:18px; overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  .frog-head {
+    background:linear-gradient(90deg,#0d5c2e,#1a8c4a);
+    padding:12px 16px; display:flex; align-items:center; gap:8px;
+  }
+  .frog-head-text { font-size:14px; font-weight:700; color:#fff; }
+  .frog-chip {
+    background:rgba(255,255,255,0.22); border:1px solid rgba(255,255,255,0.4);
+    border-radius:10px; padding:2px 8px;
+    font-size:10px; font-weight:700; color:#fff;
+  }
+  .frog-body { padding:14px 16px; }
+  .frog-steps { display:flex; flex-direction:column; gap:10px; margin-bottom:14px; }
+  .frog-step { display:flex; align-items:flex-start; gap:10px; }
+  .step-num {
+    width:20px; height:20px; border-radius:50%;
+    background:var(--green-mid); color:#fff;
+    font-size:11px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; margin-top:1px;
+  }
+  .step-text { font-size:13px; color:var(--text-mid); line-height:1.55; }
+  .step-text strong { color:var(--text-dark); }
+  .fare-grid {
+    display:grid; grid-template-columns:1fr 1fr 1fr;
+    border-top:1px solid #e5f0e9; padding-top:12px; gap:0;
+  }
+  .fare-item { text-align:center; padding:6px 4px; }
+  .fare-item:not(:last-child) { border-right:1px solid #e5f0e9; }
+  .fare-label { font-size:10.5px; color:var(--text-soft); margin-bottom:3px; }
+  .fare-price { font-size:15px; font-weight:700; color:var(--text-dark); }
+  .fare-price.highlight { color:var(--green); }
+  .fare-note { font-size:10px; color:var(--text-soft); margin-top:2px; }
+  .frog-warn {
+    margin-top:10px; background:#fff8e8;
+    border-radius:10px; padding:8px 12px;
+    font-size:11.5px; color:#7a5500; line-height:1.6;
+  }
+
+  /* ── TIMELINE ── */
+  .timeline { display:flex; flex-direction:column; }
+  .tl-item { display:flex; gap:0; }
+  .tl-left { width:70px; flex-shrink:0; text-align:right; padding-right:14px; padding-top:3px; }
+  .tl-time { font-size:13px; font-weight:700; color:var(--text-dark); }
+  .tl-dur { font-size:10px; color:var(--text-soft); margin-top:1px; }
+  .tl-mid { width:28px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; }
+  .tl-dot { width:11px; height:11px; border-radius:50%; flex-shrink:0; margin-top:4px; border:2px solid #fff; box-shadow:0 0 0 2px currentColor; }
+  .tl-line { width:2px; flex:1; min-height:24px; }
+  .tl-content { flex:1; padding:0 0 18px 10px; }
+  .tl-card {
+    background:var(--card-bg); border-radius:14px;
+    padding:12px 14px; box-shadow:var(--shadow);
+    border:1px solid rgba(0,0,0,0.05);
+  }
+  .tl-card-title { font-size:14px; font-weight:700; color:var(--text-dark); margin-bottom:4px; }
+  .tl-card-desc { font-size:12px; color:var(--text-soft); line-height:1.65; }
+
+  /* ── MENU GRID ── */
+  .menu-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .menu-card {
+    background:var(--card-bg); border-radius:14px;
+    padding:14px; box-shadow:var(--shadow);
+    border:1px solid rgba(0,0,0,0.05);
+  }
+  .menu-tag {
+    display:inline-block; font-size:10px; font-weight:700;
+    letter-spacing:.5px; padding:3px 10px;
+    border-radius:20px; margin-bottom:8px;
+  }
+  .tag-bbq { background:#fde8d8; color:#b5451b; }
+  .tag-side { background:#ddf0da; color:#2e6e20; }
+  .tag-drink { background:#dbeaf7; color:#1a5c8a; }
+  .tag-snack { background:#ede8f7; color:#6b2e9a; }
+  .menu-items { font-size:12px; color:var(--text-mid); line-height:1.85; }
+
+  /* ── CHECKLIST ── */
+  .check-section { margin-bottom:4px; }
+  .check-cat {
+    display:flex; align-items:center; gap:8px;
+    padding:10px 14px; border-radius:12px;
+    margin-bottom:6px; cursor:pointer;
+    transition: opacity .15s;
+  }
+  .check-cat:active { opacity:.8; }
+  .check-cat-icon { font-size:16px; }
+  .check-cat-label { font-size:13px; font-weight:700; color:#fff; flex:1; }
+  .check-cat-count {
+    font-size:11px; color:rgba(255,255,255,0.8);
+    background:rgba(255,255,255,0.2); border-radius:10px; padding:2px 8px;
+  }
+  .check-items { display:flex; flex-direction:column; gap:0; margin-bottom:10px; }
+  .check-row {
+    display:flex; align-items:center; gap:10px;
+    padding:11px 14px; background:#fff;
+    border-bottom:1px solid #f0f0f0;
+    transition: background .1s;
+  }
+  .check-row:first-child { border-radius:12px 12px 0 0; }
+  .check-row:last-child { border-radius:0 0 12px 12px; border-bottom:none; }
+  .check-row:only-child { border-radius:12px; border-bottom:none; }
+  .check-row:active { background:#f8f8f8; }
+  .check-box {
+    width:20px; height:20px; border-radius:6px;
+    border:2px solid #d0d0d0; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    transition: all .15s; cursor:pointer;
+  }
+  .check-box.done { background:var(--green-mid); border-color:var(--green-mid); }
+  .check-box.done::after { content:'✓'; color:#fff; font-size:12px; font-weight:700; }
+  .check-item-text { flex:1; font-size:13px; color:var(--text-dark); line-height:1.4; }
+  .check-item-text.done { color:var(--text-soft); text-decoration:line-through; }
+  .check-note { font-size:10.5px; color:var(--text-soft); text-align:right; white-space:nowrap; }
+  .check-progress {
+    height:4px; background:#eee; border-radius:2px; margin-bottom:14px; overflow:hidden;
+  }
+  .check-progress-bar {
+    height:100%; background:linear-gradient(90deg,var(--green-mid),var(--gold));
+    border-radius:2px; transition:width .3s;
+  }
+
+  /* ── CHECKLIST EDITABLE ── */
+  .check-item-input {
+    flex:1; font-size:13px; color:var(--text-dark);
+    border:none; border-bottom:1.5px solid transparent;
+    background:transparent; outline:none;
+    min-width:0; font-family:'Noto Sans KR',sans-serif;
+    cursor:text; transition:border-color .15s, background .15s;
+    border-radius:0; padding-bottom:1px;
+  }
+  .check-item-input:hover { border-bottom-color:#ddd; }
+  .check-item-input:focus {
+    border-bottom-color:var(--sky);
+    background:rgba(33,150,243,0.04);
+  }
+  .check-item-input.done { color:var(--text-soft); text-decoration:line-through; }
+  .check-assignee {
+    width:56px; font-size:11px; color:var(--sky);
+    border:none; border-bottom:1px dashed #ccc;
+    background:transparent; outline:none;
+    text-align:center; padding:2px 2px;
+    font-family:'Noto Sans KR',sans-serif; flex-shrink:0;
+  }
+  .check-assignee:focus { border-bottom-color:var(--sky); }
+  .check-assignee::placeholder { color:#ccc; }
+  .check-delete {
+    width:22px; height:22px; border-radius:50%;
+    border:none; background:#f0f0f0; color:#aaa;
+    font-size:12px; cursor:pointer; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    transition:background .15s, color .15s;
+    font-family:sans-serif;
+  }
+  .check-delete:active { background:#ffd5d5; color:#c00; }
+  .check-add-btn {
+    width:100%; padding:9px;
+    background:none; border:1.5px dashed #d0d0d0;
+    border-radius:10px; color:var(--text-soft);
+    font-size:12px; cursor:pointer; margin-bottom:10px;
+    font-family:'Noto Sans KR',sans-serif;
+    transition:border-color .15s, color .15s;
+  }
+  .check-add-btn:active { border-color:var(--sky); color:var(--sky); }
+
+  /* ── COST INPUT ── */
+  .check-cost {
+    width:48px; font-size:11px; color:#c45a1a;
+    border:none; border-bottom:1px dashed #ccc;
+    background:transparent; outline:none;
+    text-align:right; padding:2px 2px; flex-shrink:0;
+    font-family:'Noto Sans KR',sans-serif;
+  }
+  .check-cost:focus { border-bottom-color:var(--sunset); }
+  .check-cost::placeholder { color:#ddd; }
+  .check-cost::-webkit-outer-spin-button,
+  .check-cost::-webkit-inner-spin-button { -webkit-appearance:none; }
+  .check-cost[type=number] { -moz-appearance:textfield; }
+
+  /* ── ASSIGNEE SUMMARY ── */
+  .assignee-summary {
+    margin-top:14px; background:var(--warm-white);
+    border:1.5px solid rgba(26,58,92,0.1);
+    border-radius:14px; padding:14px; display:none;
+  }
+  .asgn-sum-title {
+    font-size:11px; font-weight:700; color:var(--text-soft);
+    letter-spacing:0.8px; text-transform:uppercase; margin-bottom:10px;
+  }
+  .asgn-sum-row {
+    display:flex; align-items:flex-start; gap:8px;
+    padding:7px 0; border-bottom:1px solid #f0f0f0;
+  }
+  .asgn-sum-row:last-child { border-bottom:none; }
+  .asgn-sum-name {
+    font-size:12.5px; font-weight:700; color:var(--sky);
+    min-width:60px; flex-shrink:0; padding-top:2px;
+  }
+  .asgn-sum-items { flex:1; font-size:11.5px; color:var(--text-mid); line-height:1.7; }
+  .asgn-sum-cost {
+    font-size:12px; font-weight:700; color:#c45a1a;
+    white-space:nowrap; padding-top:2px;
+  }
+
+  /* ── SETTLEMENT BUTTON ── */
+  .settlement-btn {
+    width:100%; padding:14px;
+    background:linear-gradient(135deg,#1a3a5c,#2d6a9b);
+    border:none; border-radius:14px;
+    color:#fff; font-size:15px; font-weight:700;
+    cursor:pointer; margin-top:16px;
+    font-family:'Noto Sans KR',sans-serif;
+    box-shadow:0 4px 16px rgba(26,58,92,0.2);
+    letter-spacing:0.3px;
+  }
+  .settlement-btn:active { opacity:0.9; transform:scale(0.99); }
+
+  /* ── SETTLEMENT MODAL ── */
+  .settlement-modal {
+    display:none; position:fixed; inset:0; z-index:9998;
+    background:rgba(0,0,0,0.55);
+    align-items:flex-end; justify-content:center;
+  }
+  .settlement-modal.open { display:flex; }
+  .settlement-sheet {
+    background:#fff; width:100%; max-height:85vh;
+    border-radius:22px 22px 0 0;
+    overflow-y:auto; padding:20px 18px 44px;
+  }
+  .stl-header {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:18px;
+  }
+  .stl-title { font-size:17px; font-weight:800; color:var(--text-dark); }
+  .stl-close { font-size:26px; cursor:pointer; color:#bbb; line-height:1; }
+  .stl-person {
+    background:#f8f9fa; border-radius:14px;
+    padding:14px 14px 10px; margin-bottom:10px;
+  }
+  .stl-person-name {
+    font-size:14px; font-weight:700; color:var(--sky); margin-bottom:8px;
+  }
+  .stl-item-row {
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:12.5px; color:var(--text-mid); padding:5px 0;
+    border-bottom:1px solid #eee;
+  }
+  .stl-item-row:last-of-type { border-bottom:none; }
+  .stl-item-name { flex:1; }
+  .stl-item-cost { font-size:12.5px; color:var(--text-dark); font-weight:500; white-space:nowrap; }
+  .stl-subtotal {
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:13px; font-weight:700; color:var(--text-dark);
+    margin-top:10px; padding-top:8px; border-top:1.5px solid #ddd;
+  }
+  .stl-grand {
+    background:linear-gradient(135deg,#0a4520,#1a8c4a);
+    border-radius:14px; padding:18px 16px;
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:18px;
+  }
+  .stl-grand-label { font-size:15px; font-weight:700; color:#fff; }
+  .stl-grand-amount { font-size:22px; font-weight:800; color:#fff; }
+  .stl-empty { text-align:center; color:var(--text-soft); font-size:13px; padding:24px 0; }
+
+  .toast {
+    position:fixed; bottom:28px; left:50%;
+    transform:translateX(-50%) translateY(12px);
+    background:rgba(20,20,20,0.82); color:#fff;
+    font-size:12px; padding:8px 20px; border-radius:20px;
+    opacity:0; transition:opacity .25s, transform .25s;
+    pointer-events:none; z-index:999;
+    font-family:'Noto Sans KR',sans-serif;
+  }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* ── PHOTO GALLERY ── */
+  .photo-gallery {
+    display:flex; gap:10px; overflow-x:auto; scrollbar-width:none;
+    margin-bottom:16px; padding-bottom:4px;
+  }
+  .photo-gallery::-webkit-scrollbar { display:none; }
+  .photo-card {
+    flex-shrink:0; width:200px; border-radius:14px;
+    overflow:hidden; box-shadow:var(--shadow);
+    border:1px solid rgba(0,0,0,0.06);
+  }
+  .photo-card img {
+    width:100%; height:140px; object-fit:cover; display:block;
+    background:#e8eef4;
+  }
+  .photo-card-label {
+    padding:8px 12px; font-size:11.5px; font-weight:600;
+    color:var(--text-dark); background:#fff; line-height:1.4;
+  }
+  .photo-card-sub {
+    font-size:10.5px; color:var(--text-soft); font-weight:400;
+  }
+
+  /* ── ROLES ── */
+  .role-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+  .role-card {
+    background:var(--card-bg); border-radius:14px;
+    padding:14px 10px; text-align:center;
+    box-shadow:var(--shadow); border:1px solid rgba(0,0,0,0.05);
+  }
+  .role-icon { font-size:22px; margin-bottom:6px; }
+  .role-name { font-size:11.5px; font-weight:700; color:var(--text-dark); }
+  .role-who { font-size:10px; color:var(--text-soft); margin-top:3px; }
+
+  /* ── NOTICE ── */
+  .notice-box {
+    background:#fff; border-left:4px solid var(--sunset);
+    border-radius:0 14px 14px 0; padding:14px 16px;
+    box-shadow:var(--shadow);
+  }
+  .notice-title { font-size:13px; font-weight:700; color:var(--ember); margin-bottom:8px; }
+  .notice-item { font-size:12px; color:var(--text-mid); line-height:1.75; }
+  .notice-item strong { color:var(--text-dark); }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin:28px 16px 40px;
+    text-align:center;
+    font-size:12px; color:var(--text-soft); line-height:1.8;
+  }
+  .footer .emoji-row { font-size:22px; margin-bottom:6px; }
+
+  /* ── TAB NAV ── */
+  .tab-nav {
+    position:sticky; top:0; z-index:100;
+    background:rgba(253,248,240,0.95);
+    backdrop-filter:blur(10px);
+    display:flex; gap:0;
+    border-bottom:1px solid rgba(0,0,0,0.08);
+    overflow-x:auto; scrollbar-width:none;
+    padding:0 8px;
+  }
+  .tab-nav::-webkit-scrollbar { display:none; }
+  .tab-btn {
+    flex-shrink:0; padding:12px 14px;
+    font-size:12px; font-weight:500; color:var(--text-soft);
+    border:none; background:none; cursor:pointer;
+    border-bottom:2.5px solid transparent;
+    transition:color .15s, border-color .15s;
+    white-space:nowrap;
+  }
+  .tab-btn.active { color:var(--sky); border-bottom-color:var(--sky); font-weight:700; }
+
+  .tab-pane { display:none; }
+  .tab-pane.active { display:block; }
+
+  /* ── ANIMATIONS ── */
+  .fade-in { animation: fadeUp .5s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+  .spacer { height:20px; }
+</style>
+</head>
+<body>
+
+<!-- BACK TO BLOG NAV -->
+<a href="/meimei-story/"
+   style="display:flex;align-items:center;gap:8px;padding:10px 16px;
+          background:#1a3a5c;color:rgba(255,255,255,0.82);
+          font-size:13px;font-family:'Noto Sans KR',sans-serif;
+          text-decoration:none;letter-spacing:0.2px;">
+  ← 메이메이 블로그
+</a>
+
+<!-- HERO -->
+<div class="hero">
+  <!-- Clouds -->
+  <div class="cloud cloud-1"></div>
+  <div class="cloud cloud-2"></div>
+  <div class="cloud cloud-3"></div>
+  <!-- Sun -->
+  <div class="sun-wrap">
+    <div class="sun-orb"></div>
+    <div class="sun-reflection"></div>
+  </div>
+  <!-- Mountains -->
+  <div class="mountains">
+    <div class="mt mt1"></div>
+    <div class="mt mt2"></div>
+    <div class="mt mt3"></div>
+  </div>
+  <div class="hero-tag">美美 - měi měi OUTING 2026</div>
+  <div class="hero-title">메이메이<br>소풍</div>
+  <div class="hero-sub">서울 상암동 월드컵공원 · 노을공원</div>
+  <div class="hero-date">2026년 6월 3일 &nbsp;14:00 – 20:00</div>
+  <div class="hero-weather" id="weatherWidget">
+    <span class="hw-icon">⏳</span><span class="hw-desc">날씨 불러오는 중...</span>
+  </div>
+</div>
+
+
+<!-- CONFIRMED BANNER -->
+<div class="confirmed-banner fade-in">
+  <div class="cb-top">
+    <div class="cb-icon">✅</div>
+    <div class="cb-body">
+      <div class="cb-title">A구역 예약 확정</div>
+      <div class="cb-desc">전기 O · 테이블 O · 화덕 O · 13,000원/사이트</div>
+      <div class="cb-sites">
+        <span class="cb-site-badge">A40</span>
+        <span class="cb-site-badge">A50</span>
+      </div>
+    </div>
+    <div class="cb-chip">CONFIRMED</div>
+  </div>
+  <div class="cb-map" onclick="openLightbox('https://www.seoul.go.kr/res_newseoul_story/campingjang/images/2025_noel_map.png')">
+    <div class="cb-map-inner">
+      <img src="https://www.seoul.go.kr/res_newseoul_story/campingjang/images/2025_noel_map.png" alt="노을캠핑장 A구역 지도" onerror="this.closest('.cb-map').style.display='none'">
+      <svg class="cb-map-svg" viewBox="0 0 748 546" preserveAspectRatio="xMidYMid slice">
+        <circle cx="155" cy="375" r="16" fill="rgba(220,40,40,0.88)" stroke="white" stroke-width="2.5"/>
+        <text x="155" y="375" text-anchor="middle" dominant-baseline="middle" font-size="13" font-weight="bold" fill="white">A40</text>
+        <circle cx="115" cy="430" r="16" fill="rgba(220,40,40,0.88)" stroke="white" stroke-width="2.5"/>
+        <text x="115" y="430" text-anchor="middle" dominant-baseline="middle" font-size="13" font-weight="bold" fill="white">A50</text>
+      </svg>
+    </div>
+    <div class="cb-map-caption">노을캠핑장 A구역 배치도 · 탭하여 확대</div>
+  </div>
+  <div class="cb-direction">
+    <div class="cb-dir-row">🐸 맹꽁이 전기차 하차 후 정면 안내도 확인 → 왼쪽 방향으로 이동하면 A구역 입구</div>
+    <div class="cb-dir-row">🏕️ 매점·화장실이 A구역 바로 옆 — 짐 내리기 전 사이트 위치 먼저 확인</div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+  <div id="lightbox-content">
+    <img id="lightbox-img" src="" alt="">
+  </div>
+  <div class="lightbox-hint">핀치로 확대 · 더블탭으로 2배 확대</div>
+</div>
+
+<!-- FROG BOX -->
+<div class="frog-box fade-in">
+  <div class="frog-head">
+    <span style="font-size:18px;">🐸</span>
+    <div class="frog-head-text">맹꽁이 전기차 이용 필수</div>
+    <div class="frog-chip">2025 요금</div>
+  </div>
+  <div class="frog-body">
+    <div class="frog-steps">
+      <div class="frog-step">
+        <div class="step-num">1</div>
+        <div class="step-text">노을주차장에 차량 주차</div>
+      </div>
+      <div class="frog-step">
+        <div class="step-num">2</div>
+        <div class="step-text">매표소에서 <strong>왕복표 구매</strong> — 1인 3,000원<br><span style="font-size:11px;color:#888;">편도보다 1,000원 저렴 · 귀가 시 재사용</span></div>
+      </div>
+      <div class="frog-step">
+        <div class="step-num">3</div>
+        <div class="step-text">짐칸 있는 5인승 전기차로 A구역 이동<br><span style="font-size:11px;color:#888;">20~30분 간격 운행</span></div>
+      </div>
+      <div class="frog-step">
+        <div class="step-num">4</div>
+        <div class="step-text">수화물 <strong>25kg 초과 시 10kg당 1,000원</strong> 추가</div>
+      </div>
+    </div>
+    <div class="fare-grid">
+      <div class="fare-item">
+        <div class="fare-label">편도 (1인)</div>
+        <div class="fare-price">2,000원</div>
+        <div class="fare-note">일반 기준</div>
+      </div>
+      <div class="fare-item">
+        <div class="fare-label">왕복 (1인)</div>
+        <div class="fare-price highlight">3,000원</div>
+        <div class="fare-note">권장 · 500원↓</div>
+      </div>
+      <div class="fare-item">
+        <div class="fare-label">8인 합계</div>
+        <div class="fare-price">24,000원</div>
+        <div class="fare-note">왕복 전원</div>
+      </div>
+    </div>
+    <div class="frog-warn">⚠️ 공원 내 차량 출입 전면 금지 · 하절기 운행 10:00~20:00 (매달 유동)</div>
+  </div>
+</div>
+
+<!-- TAB NAV -->
+<div class="tab-nav" id="tabNav">
+  <button class="tab-btn active" onclick="switchTab('schedule', this)">📋 일정</button>
+  <button class="tab-btn" onclick="switchTab('checklist', this)">✅ 준비물</button>
+  <button class="tab-btn" onclick="switchTab('notice', this)">📌 안내</button>
+</div>
+
+<!-- ── TAB: SCHEDULE ── -->
+<div id="tab-schedule" class="tab-pane active">
+  <div class="section">
+    <div class="sec-title">시간별 일정</div>
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-time">13:30</div>
+          <div class="tl-dur">출발</div>
+        </div>
+        <div class="tl-mid">
+          <div class="tl-dot" style="color:#1a8c4a; background:#1a8c4a;"></div>
+          <div class="tl-line" style="background:linear-gradient(#1a8c4a,#2d6a9b);"></div>
+        </div>
+        <div class="tl-content">
+          <div class="tl-card" style="border-left:3px solid #1a8c4a;">
+            <div class="tl-card-title">🚗 주차 후 맹꽁이 전기차 탑승</div>
+            <div class="tl-card-desc">노을주차장 주차 → 왕복표 구매 (1인 3,000원) → 전기차로 A구역 이동 · 짐 운반</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-time">14:00</div>
+          <div class="tl-dur">30분</div>
+        </div>
+        <div class="tl-mid">
+          <div class="tl-dot" style="color:#2d6a9b; background:#2d6a9b;"></div>
+          <div class="tl-line" style="background:linear-gradient(#2d6a9b,#4a90c4);"></div>
+        </div>
+        <div class="tl-content">
+          <div class="tl-card">
+            <div class="tl-card-title">🎪 입장 및 A구역 셋업</div>
+            <div class="tl-card-desc">체크인 · 텐트 및 그늘막 설치 · 테이블·의자 배치 · 전기 콘센트 연결 · 화덕 위치 확인</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-time">14:30</div>
+          <div class="tl-dur">30분</div>
+        </div>
+        <div class="tl-mid">
+          <div class="tl-dot" style="color:#4a90c4; background:#4a90c4;"></div>
+          <div class="tl-line" style="background:linear-gradient(#4a90c4,#6db3e0);"></div>
+        </div>
+        <div class="tl-content">
+          <div class="tl-card">
+            <div class="tl-card-title">☕ 웰컴 티타임 & 근황 토크</div>
+            <div class="tl-card-desc">커피·차·음료 세팅 · 다과 · 자유로운 근황 이야기 및 재회 인사</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-time">15:00</div>
+          <div class="tl-dur">60분</div>
+        </div>
+        <div class="tl-mid">
+          <div class="tl-dot" style="color:#6db3e0; background:#6db3e0;"></div>
+          <div class="tl-line" style="background:linear-gradient(#6db3e0,#5cb88a);"></div>
+        </div>
+        <div class="tl-content">
+          <div class="tl-card">
+            <div class="tl-card-title">🎮 레크리에이션 & 산책</div>
+            <div class="tl-card-desc">노을공원 주변 산책 · 윷놀이 · 보드게임 · 노을카페 방문 가능</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-time">16:00</div>
+          <div class="tl-dur">60분</div>
+        </div>
+        <div class="tl-mid">
+          <div class="tl-dot" style="color:#5cb88a; background:#5cb88a;"></div>
+          <div class="tl-line" style="background:linear-gradient(#5cb88a,#e8803a);"></div>
+        </div>
+        <div class="tl-content">
+          <div class="tl-card">
+            <div class="tl-card-title">🔥 BBQ 준비 & 화덕 불 피우기</div>
+            <div class="tl-card-desc">A구역 화덕 세팅 · 숯불 점화 · 식재료 손질 · 역할 분담하여 협력</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-time">17:00</div>
+          <div class="tl-dur">90분</div>
+        </div>
+        <div class="tl-mid">
+          <div class="tl-dot" style="color:#e8803a; background:#e8803a;"></div>
+          <div class="tl-line" style="background:linear-gradient(#e8803a,#c45a1a);"></div>
+        </div>
+        <div class="tl-content">
+          <div class="tl-card" style="border-left:3px solid #e8803a;">
+            <div class="tl-card-title">🥩 BBQ 저녁 식사</div>
+            <div class="tl-card-desc">고기 굽기 · 노을 감상하며 식사 · 반주 한 잔 · 서로 구워주며 즐기기</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-time">18:30</div>
+          <div class="tl-dur">60분</div>
+        </div>
+        <div class="tl-mid">
+          <div class="tl-dot" style="color:#c45a1a; background:#c45a1a;"></div>
+          <div class="tl-line" style="background:linear-gradient(#c45a1a,#8a3a9e);"></div>
+        </div>
+        <div class="tl-content">
+          <div class="tl-card" style="border-left:3px solid #f5c842;">
+            <div class="tl-card-title">🌅 노을 감상 & 담소</div>
+            <div class="tl-card-desc">서울 최고의 노을 포인트 · 단체 사진 · 차 한 잔 · 후식 · 추억 이야기</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-time">19:30</div>
+          <div class="tl-dur">30분</div>
+        </div>
+        <div class="tl-mid">
+          <div class="tl-dot" style="color:#8a3a9e; background:#8a3a9e;"></div>
+          <div class="tl-line" style="background:linear-gradient(#8a3a9e,#553380);"></div>
+        </div>
+        <div class="tl-content">
+          <div class="tl-card">
+            <div class="tl-card-title">🎉 마무리 & 다음 모임 약속</div>
+            <div class="tl-card-desc">정리 정돈 · 다음 소풍 날짜 논의 · 맹꽁이 전기차로 주차장 귀환</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-time">20:00</div>
+        </div>
+        <div class="tl-mid">
+          <div class="tl-dot" style="color:#553380; background:#553380;"></div>
+        </div>
+        <div class="tl-content" style="padding-bottom:4px;">
+          <div style="padding-top:3px; font-size:13px; font-weight:700; color:var(--text-soft);">✅ 퇴장 · 왕복표로 귀환</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="spacer"></div>
+  </div>
+</div>
+
+<!-- ── TAB: CHECKLIST ── -->
+<div id="tab-checklist" class="tab-pane">
+  <div class="section">
+    <div class="sec-title">준비물 체크리스트</div>
+    <div class="check-progress"><div class="check-progress-bar" id="progressBar" style="width:0%"></div></div>
+    <div id="checklistContainer"></div>
+    <div id="assigneeSummary" class="assignee-summary"></div>
+    <button class="settlement-btn" onclick="showSettlement()">💰 정산</button>
+    <div class="spacer"></div>
+  </div>
+</div>
+
+<!-- SETTLEMENT MODAL -->
+<div class="settlement-modal" id="settlementModal" onclick="closeSettlement()">
+  <div class="settlement-sheet" onclick="event.stopPropagation()">
+    <div class="stl-header">
+      <div class="stl-title">💰 정산 내역</div>
+      <span class="stl-close" onclick="closeSettlement()">✕</span>
+    </div>
+    <div id="settlementContent"></div>
+  </div>
+</div>
+
+<!-- ── TAB: NOTICE ── -->
+<div id="tab-notice" class="tab-pane">
+  <div class="section">
+    <div class="sec-title">현장 사진</div>
+    <div class="photo-gallery">
+      <div class="photo-card">
+        <img src="https://www.5gcamp.com/files/camping/2017/12/28/bb3a2b4a7dd8dcdccf32237f5e197cc3212136.jpg"
+             alt="노을캠핑장 A구역"
+             onerror="this.style.background='#dde8f0';this.alt='노을캠핑장 A구역'">
+        <div class="photo-card-label">
+          노을캠핑장 A구역<br>
+          <span class="photo-card-sub">전기 · 테이블 · 화덕 완비</span>
+        </div>
+      </div>
+      <div class="photo-card">
+        <img src="https://www.gocamping.or.kr/upload/camp/609/thumb/thumb_1000_5302OGOKlcpzcByOuwfvW5Eg.jpg"
+             alt="맹꽁이 전기차"
+             onerror="this.style.background='#dde8f0';this.alt='맹꽁이 전기차'">
+        <div class="photo-card-label">
+          맹꽁이 전기차<br>
+          <span class="photo-card-sub">노을주차장 ↔ A구역 운행</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-title" style="margin-top:4px;">안내 및 주의사항</div>
+    <div class="notice-box">
+      <div class="notice-title">📌 A구역 & 캠핑장 안내</div>
+      <div class="notice-item">· <strong>A구역:</strong> 전기 콘센트 O · 테이블 O · 화덕 O · 13,000원/사이트</div>
+      <div class="notice-item">· 텐트 등 장비 일체 <strong>자체 지참</strong> (현장 대여 없음)</div>
+      <div class="notice-item">· 예약자 본인 현장 방문 + <strong>신분증 지참 필수</strong></div>
+      <div class="notice-item">· <strong>반려동물 출입 금지</strong></div>
+      <div class="notice-item">· <strong>금연 구역</strong></div>
+      <div class="notice-item">· 텐트 내 개별 난로 반입 금지</div>
+      <div class="notice-item">· 기상특보 발령 시 운영 중단 → 전액 환불</div>
+      <div class="notice-item">· 노을공원 내 <strong>차량 출입 전면 금지</strong> — 맹꽁이 전기차 이용</div>
+    </div>
+    <div class="spacer"></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="emoji-row">🌅 🔥 🥂</div>
+  노을이 가장 아름다운 서울의 하늘 아래<br>
+  오랜 인연의 소중한 시간<br>
+  <strong style="color:var(--sky);">즐겁고 따뜻한 메이메이 소풍 되시길 바랍니다!</strong>
+</div>
+
+<script>
+// ── FIREBASE CONFIG ── Firebase 콘솔에서 복사한 값으로 교체하세요
+const firebaseConfig = {
+  apiKey: "AIzaSyCszbfMt-dUM9zCDpivTXm0jKxIqGX9Jvg",
+  authDomain: "camping-2026-af510.firebaseapp.com",
+  databaseURL: "https://camping-2026-af510-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "camping-2026-af510",
+  storageBucket: "camping-2026-af510.firebasestorage.app",
+  messagingSenderId: "949232417667",
+  appId: "1:949232417667:web:8fe4b6aefcb54d46e314b6",
+};
+firebase.initializeApp(firebaseConfig);
+const checklistRef = firebase.database().ref('checklist');
+
+// Tab switching
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  btn.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+}
+
+// Toast
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg || '저장됨 ✓';
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// Default checklist data
+const defaultCats = [
+  { cat:'⛺ 캠핑 장비', color:'#1A4A6B', items:[
+    {t:'텐트 / 그늘막 타프'},{t:'테이블 · 의자'},{t:'화덕용 숯 · 착화제 · 라이터'},
+    {t:'그릴망 · 집게 · 바베큐 장갑'},{t:'랜턴 / LED 조명'},{t:'돗자리 · 방석'},{t:'아이스박스 · 아이스팩'},
+  ]},
+  { cat:'🍽️ 주방 용품', color:'#E8803A', items:[
+    {t:'접시 · 컵 · 수저 세트'},{t:'냄비 (찌개용)'},{t:'알루미늄 포일'},
+    {t:'키친타월 · 위생장갑 · 앞치마'},{t:'식용유 · 소금 · 후추 · 버터'},
+    {t:'물티슈 · 쓰레기봉투 (대형)'},{t:'세제 · 수세미'},
+  ]},
+  { cat:'🥩 식재료', color:'#C45A1A', items:[
+    {t:'삼겹살 · 목살'},{t:'소고기 (채끝·꽃등심)'},{t:'닭날개 (양념구이)'},
+    {t:'소시지 · 옥수수'},{t:'쌈채소 (상추·깻잎·쑥갓)'},{t:'쌈장 · 파절이 · 김치'},
+    {t:'버섯 · 두부'},{t:'된장찌개 재료'},{t:'과일 (수박·참외)'},{t:'떡 · 약과 · 간식'},{t:'인스턴트 라면'},
+  ]},
+  { cat:'🍻 음료', color:'#2D6A9B', items:[
+    {t:'생수 · 탄산수'},{t:'커피 · 차 (티백)'},
+  ]},
+  { cat:'👤 개인 지참물', color:'#5C5C5C', items:[
+    {t:'편한 야외 복장 · 겉옷'},{t:'신분증'},{t:'선크림 · 선글라스'},
+    {t:'모기 기피제'},{t:'개인 상비약'},{t:'보조배터리'},{t:'카메라 / 스마트폰'},
+  ]},
+  { cat:'🎮 여가 용품', color:'#6B3A9E', items:[
+    {t:'윷놀이 세트'},{t:'보드게임 / 화투 / 카드'},{t:'블루투스 스피커'},{t:'셀카봉 · 삼각대'},
+  ]},
+];
+
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+// Firebase 저장 (500ms 디바운스 — 빠른 연속 입력 시 불필요한 쓰기 방지)
+function saveData() {
+  clearTimeout(saveData._t);
+  saveData._t = setTimeout(() => {
+    checklistRef.set(checkData)
+      .then(() => showToast('저장됨 ✓'))
+      .catch((err) => { console.error('Firebase 저장 실패:', err); showToast('저장 실패 ⚠️'); });
+  }, 500);
+}
+
+let checkData = [];
+
+function updateProgress() {
+  let total = 0, done = 0;
+  checkData.forEach(cat => cat.items.forEach(item => { total++; if (item.done) done++; }));
+  const pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function updateCatCount(ci) {
+  const sec = document.getElementById('checklistContainer').children[ci];
+  if (sec) sec.querySelector('.check-cat-count').textContent = checkData[ci].items.length + '개';
+}
+
+function makeRow(ci, ii) {
+  const item = checkData[ci].items[ii];
+  const row = document.createElement('div');
+  row.className = 'check-row';
+
+  const box = document.createElement('div');
+  box.className = 'check-box' + (item.done ? ' done' : '');
+  box.onclick = () => {
+    item.done = !item.done;
+    box.classList.toggle('done', item.done);
+    inp.classList.toggle('done', item.done);
+    updateProgress();
+    saveData();
+  };
+
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.className = 'check-item-input' + (item.done ? ' done' : '');
+  inp.value = item.t;
+  inp.onblur = () => { if (item.t !== inp.value) { item.t = inp.value; saveData(); } };
+
+  const cost = document.createElement('input');
+  cost.type = 'number';
+  cost.className = 'check-cost';
+  cost.min = '0';
+  cost.placeholder = '비용';
+  cost.value = item.cost > 0 ? item.cost : '';
+  cost.oninput = () => { item.cost = parseInt(cost.value) || 0; buildAssigneeSummary(); };
+  cost.onblur = () => saveData();
+
+  const asgn = document.createElement('input');
+  asgn.type = 'text';
+  asgn.className = 'check-assignee';
+  asgn.placeholder = '담당자';
+  asgn.value = item.assignee || '';
+  asgn.oninput = () => { item.assignee = asgn.value; buildAssigneeSummary(); };
+  asgn.onblur = () => saveData();
+
+  const del = document.createElement('button');
+  del.className = 'check-delete';
+  del.textContent = '✕';
+  del.onclick = () => { checkData[ci].items.splice(ii, 1); buildChecklist(); updateProgress(); saveData(); };
+
+  row.appendChild(box);
+  row.appendChild(inp);
+  row.appendChild(cost);
+  row.appendChild(asgn);
+  row.appendChild(del);
+  return row;
+}
+
+function buildAssigneeSummary() {
+  const el = document.getElementById('assigneeSummary');
+  if (!el) return;
+  const map = {};
+  checkData.forEach(cat => {
+    cat.items.forEach(item => {
+      const names = (item.assignee || '').split(/[,，·\s\/]+/).map(s => s.trim()).filter(Boolean);
+      names.forEach(name => {
+        if (!map[name]) map[name] = { items: [], cost: 0 };
+        map[name].items.push(item.t || '(항목)');
+        map[name].cost += item.cost || 0;
+      });
+    });
+  });
+  const entries = Object.entries(map);
+  if (!entries.length) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  el.innerHTML = '<div class="asgn-sum-title">담당자별 취합</div>' +
+    entries.map(([name, d]) =>
+      `<div class="asgn-sum-row">
+        <div class="asgn-sum-name">${name}</div>
+        <div class="asgn-sum-items">${d.items.join(' · ')}</div>
+        ${d.cost > 0 ? `<div class="asgn-sum-cost">₩${d.cost.toLocaleString()}</div>` : ''}
+      </div>`
+    ).join('');
+}
+
+function showSettlement() {
+  const map = {};
+  let grand = 0;
+  checkData.forEach(cat => {
+    cat.items.forEach(item => {
+      const c = item.cost || 0;
+      grand += c;
+      const names = (item.assignee || '').split(/[,，·\s\/]+/).map(s => s.trim()).filter(Boolean);
+      names.forEach(name => {
+        if (!map[name]) map[name] = [];
+        map[name].push({ t: item.t || '(항목)', cost: c });
+      });
+    });
+  });
+  const entries = Object.entries(map);
+  let html = '';
+  if (!entries.length && grand === 0) {
+    html = '<div class="stl-empty">담당자 또는 비용이 입력된 항목이 없습니다.</div>';
+  } else {
+    entries.forEach(([name, items]) => {
+      const sub = items.reduce((s, i) => s + i.cost, 0);
+      html += `<div class="stl-person">
+        <div class="stl-person-name">${name}</div>
+        ${items.map(i => `<div class="stl-item-row">
+          <span class="stl-item-name">${i.t}</span>
+          <span class="stl-item-cost">${i.cost > 0 ? '₩' + i.cost.toLocaleString() : '-'}</span>
+        </div>`).join('')}
+        <div class="stl-subtotal"><span>소계</span><span>₩${sub.toLocaleString()}</span></div>
+      </div>`;
+    });
+    html += `<div class="stl-grand">
+      <span class="stl-grand-label">전체 합계</span>
+      <span class="stl-grand-amount">₩${grand.toLocaleString()}</span>
+    </div>`;
+  }
+  document.getElementById('settlementContent').innerHTML = html;
+  document.getElementById('settlementModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSettlement() {
+  document.getElementById('settlementModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function buildChecklist() {
+  const wrap = document.getElementById('checklistContainer');
+  wrap.innerHTML = '';
+  checkData.forEach((cat, ci) => {
+    const sec = document.createElement('div');
+    sec.className = 'check-section';
+
+    const head = document.createElement('div');
+    head.className = 'check-cat';
+    head.style.background = cat.color;
+    head.innerHTML = `<span class="check-cat-label">${cat.cat}</span><span class="check-cat-count">${cat.items.length}개</span>`;
+    sec.appendChild(head);
+
+    const list = document.createElement('div');
+    list.className = 'check-items';
+    cat.items.forEach((_, ii) => list.appendChild(makeRow(ci, ii)));
+    sec.appendChild(list);
+
+    const addBtn = document.createElement('button');
+    addBtn.className = 'check-add-btn';
+    addBtn.textContent = '+ 항목 추가';
+    addBtn.onclick = () => {
+      checkData[ci].items.push({ id: genId(), t: '', assignee: '', done: false });
+      const ii = checkData[ci].items.length - 1;
+      const row = makeRow(ci, ii);
+      list.appendChild(row);
+      row.querySelector('.check-item-input').focus();
+      updateCatCount(ci);
+      updateProgress();
+      saveData();
+    };
+    sec.appendChild(addBtn);
+
+    wrap.appendChild(sec);
+  });
+  buildAssigneeSummary();
+}
+
+function initChecklist() {
+  // Firebase 응답을 기다리지 않고 기본값으로 즉시 렌더링
+  checkData = defaultCats.map(cat => ({
+    cat: cat.cat, color: cat.color,
+    items: cat.items.map(item => ({ id: genId(), t: item.t, assignee: '', cost: 0, done: false }))
+  }));
+  buildChecklist();
+  updateProgress();
+
+  // Firebase 실시간 구독 — 저장된 데이터가 있으면 덮어씀
+  checklistRef.on('value', (snapshot) => {
+    const incoming = snapshot.val();
+
+    if (!incoming || !Array.isArray(incoming) || incoming.length === 0) {
+      // DB가 비어있으면 현재 기본값을 Firebase에 저장
+      checklistRef.set(checkData);
+      return;
+    }
+
+    // 내 저장과 다른 내용일 때만 화면 갱신
+    if (JSON.stringify(incoming) !== JSON.stringify(checkData)) {
+      checkData = incoming;
+      buildChecklist();
+      updateProgress();
+    }
+  });
+}
+
+// ── WEATHER WIDGET ──
+function getWeatherInfo(code) {
+  if (code === 0)              return { icon:'☀️',  desc:'맑음' };
+  if (code === 1)              return { icon:'🌤️', desc:'대체로 맑음' };
+  if (code === 2)              return { icon:'⛅',  desc:'구름 조금' };
+  if (code === 3)              return { icon:'🌥️', desc:'흐림' };
+  if (code<=48 && code>=45)   return { icon:'🌫️', desc:'안개' };
+  if (code>=51 && code<=57)   return { icon:'🌦️', desc:'이슬비' };
+  if (code>=61 && code<=67)   return { icon:'🌧️', desc:'비' };
+  if (code>=71 && code<=77)   return { icon:'❄️',  desc:'눈' };
+  if (code>=80 && code<=82)   return { icon:'🌦️', desc:'소나기' };
+  if (code>=95)                return { icon:'⛈️', desc:'뇌우' };
+  return { icon:'🌡️', desc:'-' };
+}
+
+async function fetchWeather() {
+  const el = document.getElementById('weatherWidget');
+  if (!el) return;
+  const eventDate = new Date('2026-06-03T14:00:00+09:00');
+  const daysLeft = Math.ceil((eventDate - Date.now()) / 86400000);
+  try {
+    const url = 'https://api.open-meteo.com/v1/forecast?latitude=37.57&longitude=126.89' +
+      '&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode' +
+      '&timezone=Asia%2FSeoul&start_date=2026-06-03&end_date=2026-06-03';
+    const res = await fetch(url);
+    const data = await res.json();
+    const d = data.daily;
+    if (d && d.temperature_2m_max && d.temperature_2m_max[0] !== null) {
+      const tmax = Math.round(d.temperature_2m_max[0]);
+      const tmin = Math.round(d.temperature_2m_min[0]);
+      const rain = d.precipitation_probability_max[0] ?? '--';
+      const wi = getWeatherInfo(d.weathercode[0]);
+      el.innerHTML = `<span class="hw-icon">${wi.icon}</span>` +
+        `<span class="hw-temp">${tmax}° / ${tmin}°</span>` +
+        `<span class="hw-sep">·</span>` +
+        `<span class="hw-rain">☂ ${rain}%</span>` +
+        `<span class="hw-sep">·</span>` +
+        `<span class="hw-desc">${wi.desc}</span>`;
+    } else {
+      el.innerHTML = `<span class="hw-icon">⏳</span>` +
+        `<span class="hw-desc">D-${daysLeft} &nbsp;예보 준비 중</span>`;
+    }
+  } catch(_) {
+    el.innerHTML = `<span class="hw-icon">⏳</span>` +
+      `<span class="hw-desc">D-${daysLeft} &nbsp;예보 준비 중</span>`;
+  }
+}
+fetchWeather();
+
+initChecklist();
+
+// ── LIGHTBOX + PINCH ZOOM ──
+(function() {
+  const lb = document.getElementById('lightbox');
+  const content = document.getElementById('lightbox-content');
+  const img = document.getElementById('lightbox-img');
+  let scale = 1, pinchStartScale = 1, pinchStartDist = 0;
+  let tx = 0, ty = 0, panStartX = 0, panStartY = 0, panStartTx = 0, panStartTy = 0;
+  let isPinching = false, isPanning = false, lastTapTime = 0;
+
+  function applyT() {
+    content.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
+  }
+  function resetT() {
+    scale = 1; tx = 0; ty = 0; content.style.transform = '';
+  }
+
+  const MAP_W = 748, MAP_H = 546;
+  const MAP_MARKERS = [
+    { x: 155, y: 375, label: 'A40' },
+    { x: 115, y: 430, label: 'A50' },
+  ];
+
+  function addLbMarkers() {
+    content.querySelectorAll('.lb-marker').forEach(m => m.remove());
+    const iw = img.offsetWidth, ih = img.offsetHeight;
+    MAP_MARKERS.forEach(({ x, y, label }) => {
+      const el = document.createElement('div');
+      el.className = 'lb-marker';
+      el.textContent = label;
+      el.style.left = (x / MAP_W * iw) + 'px';
+      el.style.top  = (y / MAP_H * ih) + 'px';
+      content.appendChild(el);
+    });
+  }
+
+  window.openLightbox = function(src) {
+    resetT();
+    img.src = src;
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    const place = () => requestAnimationFrame(addLbMarkers);
+    if (img.complete && img.naturalWidth) { place(); }
+    else { img.onload = place; }
+  };
+  window.closeLightbox = function() {
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+    resetT();
+  };
+
+  lb.addEventListener('click', function(e) {
+    if (e.target === lb) closeLightbox();
+  });
+
+  lb.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 2) {
+      isPinching = true; isPanning = false;
+      e.preventDefault();
+      pinchStartDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      pinchStartScale = scale;
+    } else if (e.touches.length === 1) {
+      if (scale > 1) {
+        isPanning = true;
+        panStartX = e.touches[0].clientX; panStartY = e.touches[0].clientY;
+        panStartTx = tx; panStartTy = ty;
+      }
+      const now = Date.now();
+      if (now - lastTapTime < 280) {
+        e.preventDefault();
+        if (scale > 1.5) { resetT(); } else { scale = 2.5; tx = 0; ty = 0; applyT(); }
+        lastTapTime = 0;
+      } else { lastTapTime = now; }
+    }
+  }, { passive: false });
+
+  lb.addEventListener('touchmove', function(e) {
+    if (isPinching && e.touches.length === 2) {
+      e.preventDefault();
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      scale = Math.min(6, Math.max(1, pinchStartScale * dist / pinchStartDist));
+      applyT();
+    } else if (isPanning && e.touches.length === 1) {
+      e.preventDefault();
+      tx = panStartTx + (e.touches[0].clientX - panStartX);
+      ty = panStartTy + (e.touches[0].clientY - panStartY);
+      applyT();
+    }
+  }, { passive: false });
+
+  lb.addEventListener('touchend', function(e) {
+    if (e.touches.length < 2) isPinching = false;
+    if (e.touches.length === 0) { isPanning = false; if (scale < 1.05) resetT(); }
+  });
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+})();
+</script>
+<div id="toast" class="toast"></div>
+</body>
+</html>
