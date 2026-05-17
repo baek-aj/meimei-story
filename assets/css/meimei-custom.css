@@ -1,14 +1,10 @@
----
----
-
-@import "{{ site.theme }}";
-
+/* Created: 2026-05-17 22:01 */
 /* ══════════════════════════════════════════════════════════
    우리는 메이메이 입니다 — 커스텀 스타일
    美美(měi měi) · 50대의 품격 · 20년 인연의 온기
    ══════════════════════════════════════════════════════════ */
 
-/* ── 전체 폰트: 나눔명조 (제목) + Noto Sans KR (본문) ── */
+/* ── 전체 폰트 ── */
 body {
   font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
   word-break: keep-all;
@@ -20,31 +16,31 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.01em;
 }
 
-/* ── 배경: 따뜻한 한지 크림 + 은은한 온기 ──
-   오래된 손편지, 사진첩처럼 따스한 시간의 질감 */
+/* ── 배경: 따뜻한 한지 크림
+   오래된 손편지, 사진첩처럼 따스한 시간의 질감 ── */
 body {
-  background-color: #FAF6EF;
+  background-color: #FAF6EF !important;
   background-image:
     radial-gradient(ellipse 70% 45% at 18% 25%, rgba(200, 150, 80, 0.055) 0%, transparent 100%),
-    radial-gradient(ellipse 55% 40% at 82% 78%, rgba(200, 150, 80, 0.055) 0%, transparent 100%);
+    radial-gradient(ellipse 55% 40% at 82% 78%, rgba(200, 150, 80, 0.055) 0%, transparent 100%) !important;
 }
 
 html[data-mode="dark"] body {
-  background-color: #18120A;
+  background-color: #18120A !important;
   background-image:
     radial-gradient(ellipse 70% 45% at 18% 25%, rgba(200, 130, 50, 0.04) 0%, transparent 100%),
-    radial-gradient(ellipse 55% 40% at 82% 78%, rgba(200, 130, 50, 0.04) 0%, transparent 100%);
+    radial-gradient(ellipse 55% 40% at 82% 78%, rgba(200, 130, 50, 0.04) 0%, transparent 100%) !important;
 }
 
 /* ── 사이드바: 깊은 밤하늘 + 금빛 온기 ── */
 #sidebar {
   background: linear-gradient(168deg, #1C2E54 0%, #101E3C 100%) !important;
-  border-right: 1px solid rgba(200, 155, 70, 0.18);
-  position: relative;
-  overflow: hidden;
+  border-right: 1px solid rgba(200, 155, 70, 0.18) !important;
+  position: relative !important;
+  overflow: hidden !important;
 }
 
-/* 사이드바 상단 금빛 라인 — 아름다움의 테두리 */
+/* 사이드바 상단 금빛 라인 */
 #sidebar::before {
   content: '';
   position: absolute;
@@ -63,40 +59,40 @@ html[data-mode="dark"] body {
 
 /* 美美 워터마크 — 아름다움이라는 이름을 은은하게 */
 #sidebar::after {
-  content: '美美';
+  content: '\7F8E\7F8E';
   position: absolute;
   bottom: 22px;
   right: 10px;
   font-family: 'Nanum Myeongjo', serif;
   font-size: 3.8rem;
   font-weight: 800;
-  color: rgba(210, 165, 75, 0.09);
+  color: rgba(210, 165, 75, 0.10);
   pointer-events: none;
   user-select: none;
   letter-spacing: -0.02em;
   line-height: 1;
 }
 
-/* 블로그 제목: 나눔명조 Bold — 50대의 무게와 품격 */
+/* 블로그 제목 — 나눔명조 Bold, 50대의 무게와 품격 */
 #sidebar .site-title,
 #sidebar .site-title a {
   font-family: 'Nanum Myeongjo', serif !important;
   font-weight: 800 !important;
   font-size: 1.18rem !important;
-  letter-spacing: 0.04em;
-  line-height: 1.45;
+  letter-spacing: 0.04em !important;
+  line-height: 1.45 !important;
   color: #F5DEB3 !important;
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.35) !important;
 }
 
-/* 부제목: 이탤릭 명조 — 조용하고 그윽한 */
+/* 부제목 — 이탤릭 명조, 조용하고 그윽한 */
 #sidebar .site-subtitle {
   font-family: 'Nanum Myeongjo', serif !important;
-  font-style: italic;
-  font-size: 0.82rem;
+  font-style: italic !important;
+  font-size: 0.82rem !important;
   color: rgba(245, 222, 179, 0.60) !important;
-  letter-spacing: 0.05em;
-  line-height: 1.6;
+  letter-spacing: 0.05em !important;
+  line-height: 1.6 !important;
 }
 
 /* 사이드바 아바타 — 금빛 테두리 */
@@ -106,84 +102,80 @@ html[data-mode="dark"] body {
   box-shadow: 0 0 0 4px rgba(200, 155, 70, 0.12) !important;
 }
 
-/* 사이드바 네비 텍스트 */
+/* 사이드바 네비게이션 */
 #sidebar nav a,
 #sidebar nav li a,
-#sidebar .nav-item a {
+#sidebar .nav-item a,
+#sidebar #sidebar-trigger {
   color: rgba(220, 195, 150, 0.80) !important;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease !important;
 }
 
 #sidebar nav a.active,
-#sidebar nav a:hover,
+#sidebar nav li a.active,
 #sidebar .nav-item a.active,
+#sidebar nav a:hover,
 #sidebar .nav-item a:hover {
   color: #F5C842 !important;
 }
 
-/* 사이드바 하단 텍스트 */
-#sidebar footer,
-#sidebar .sidebar-bottom {
-  color: rgba(200, 175, 130, 0.45);
+/* 사이드바 아이콘 */
+#sidebar nav i,
+#sidebar .nav-item i {
+  color: rgba(200, 155, 70, 0.65) !important;
 }
 
-/* ── 포스트 제목: 나눔명조 ── */
+#sidebar nav a.active i,
+#sidebar nav a:hover i,
+#sidebar .nav-item a.active i {
+  color: #F5C842 !important;
+}
+
+/* ── 포스트 제목 ── */
 .post-title,
 h1.post-title,
-#post-title {
-  font-family: 'Nanum Myeongjo', serif;
-  font-weight: 800;
-  font-size: 2rem;
-  line-height: 1.45;
+#post-title,
+article .post-title {
+  font-family: 'Nanum Myeongjo', serif !important;
+  font-weight: 800 !important;
+  line-height: 1.45 !important;
   color: #2C1A0E;
 }
 
 html[data-mode="dark"] .post-title,
 html[data-mode="dark"] h1.post-title {
-  color: #F5DEB3;
+  color: #F5DEB3 !important;
 }
 
 /* ── 링크: 따뜻한 호박빛 ── */
-a {
+a:not(#sidebar a):not(.btn) {
   color: #7A4D20;
 }
-a:hover {
+a:not(#sidebar a):not(.btn):hover {
   color: #C8965A;
 }
 
-html[data-mode="dark"] a {
+html[data-mode="dark"] a:not(#sidebar a):not(.btn) {
   color: #C8965A;
 }
-html[data-mode="dark"] a:hover {
+html[data-mode="dark"] a:not(#sidebar a):not(.btn):hover {
   color: #F0C060;
 }
 
-/* ── 인용구: 명조 이탤릭 + 금빛 왼쪽 선 ── */
+/* ── 인용구: 금빛 왼쪽 선 + 명조 이탤릭 ── */
 blockquote {
   border-left: 4px solid #C8965A !important;
-  background: rgba(200, 150, 80, 0.05);
-  border-radius: 0 8px 8px 0;
-  font-family: 'Nanum Myeongjo', serif;
-  font-style: italic;
+  background: rgba(200, 150, 80, 0.05) !important;
+  border-radius: 0 8px 8px 0 !important;
+  font-family: 'Nanum Myeongjo', serif !important;
+  font-style: italic !important;
 }
 
-/* ── 포스트 목록 제목 ── */
-.post-preview .post-title,
-.card-title,
-article h1 {
-  font-family: 'Nanum Myeongjo', serif;
-}
-
-/* ── 포스트 구분선: 부드러운 금빛 ── */
-.post-preview {
-  border-bottom-color: rgba(200, 150, 80, 0.2) !important;
-}
-
-/* ── 태그 & 카테고리 ── */
+/* ── 태그 ── */
 .post-tag {
-  border-radius: 20px;
+  border-radius: 20px !important;
   border-color: rgba(200, 150, 80, 0.35) !important;
-  color: #8B5830 !important;
+  color: #7A4D20 !important;
 }
 
 .post-tag:hover {
@@ -191,15 +183,15 @@ article h1 {
   color: #C8965A !important;
 }
 
-html[data-mode="dark"] .post-tag {
-  border-color: rgba(200, 150, 80, 0.4) !important;
-  color: #C8965A !important;
+/* ── 포스트 목록 구분선 ── */
+.post-preview {
+  border-bottom-color: rgba(200, 150, 80, 0.18) !important;
 }
 
-/* ── 스크롤바: 금빛 포인트 ── */
+/* ── 스크롤바 ── */
 ::-webkit-scrollbar-thumb {
-  background: rgba(200, 150, 80, 0.35);
+  background: rgba(200, 150, 80, 0.30);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(200, 150, 80, 0.6);
+  background: rgba(200, 150, 80, 0.55);
 }
