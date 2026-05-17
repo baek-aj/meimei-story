@@ -1,0 +1,8 @@
+# Created: 2026-05-17 22:01
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+vendor/
+.bundle/
+Gemfile.lock

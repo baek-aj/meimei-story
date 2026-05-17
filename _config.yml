@@ -1,0 +1,75 @@
+# Created: 2026-05-17 22:01
+theme: jekyll-theme-chirpy
+
+lang: ko
+
+timezone: Asia/Seoul
+
+title: 우리는 메이메이 입니다
+
+tagline: 2005년부터 이어온 목장 공동체의 이야기
+
+description: >-
+  2005년 일산은혜교회 목장에서 처음 만나 20년이 넘도록 함께 삶을 나누는
+  메이메이 그룹의 이야기와 추억을 기록합니다.
+
+url: "https://baek-aj.github.io"
+
+baseurl: "/meimei-story"
+
+github:
+  username: baek-aj
+
+social:
+  name: 메이메이
+  email: ""
+  links: []
+
+google_site_verification: ""
+
+google_analytics:
+  id: ""
+
+theme_mode: ""
+
+cdn: ""
+
+avatar: ""
+
+toc: true
+
+comments:
+  active: ""
+
+paginate: 10
+
+kramdown:
+  syntax_highlighter_style: github
+
+compress_html:
+  clippings: all
+  comments: all
+  endings: all
+  profile: false
+  blanklines: false
+  ignore:
+    envs: [development]
+
+exclude:
+  - "*.gem"
+  - "*.gemspec"
+  - tools
+  - README.md
+  - CHANGELOG.md
+  - LICENSE
+  - "node_modules"
+  - "package*.json"
+
+jekyll-archives:
+  enabled: [categories, tags]
+  layouts:
+    category: category
+    tag: tag
+  permalinks:
+    tag: /tags/:name/
+    category: /categories/:name/
